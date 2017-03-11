@@ -169,19 +169,24 @@ enum MenuModelSetupItems {
 #endif
 
 #if defined(PCBX7)
+bool static bindingChoiceMade = false;
 void onBindMenu(const char * result)
 {
   if (result == STR_BINDING_MODE1) {
     g_model.moduleData[INTERNAL_MODULE].pxx.bind_mode = 0;
+    bindingChoiceMade = true;
   }
   else if (result == STR_BINDING_MODE2) {
     g_model.moduleData[INTERNAL_MODULE].pxx.bind_mode = MODULE_BIND_TELEM_OFF-MODULE_BIND;
+    bindingChoiceMade = true;
   }
   else if (result == STR_BINDING_MODE3) {
     g_model.moduleData[INTERNAL_MODULE].pxx.bind_mode = MODULE_BIND_9_16-MODULE_BIND;
+    bindingChoiceMade = true;
   }
   else if (result == STR_BINDING_MODE4) {
     g_model.moduleData[INTERNAL_MODULE].pxx.bind_mode = MODULE_BIND_9_16_TELEM_OFF-MODULE_BIND;
+    bindingChoiceMade = true;
   }
 }
 #endif
@@ -829,22 +834,20 @@ void menuModelSetup(event_t event)
             }
 #endif
             if (attr && l_posHorz>0) {
-              static bool inPopupMenu = false;
               if(s_editMode>0) {
                 if (l_posHorz == 1) {
                   if (IS_MODULE_XJT(moduleIdx) && g_model.moduleData[moduleIdx].rfProtocol== RF_PROTO_X16 && s_current_protocol[INTERNAL_MODULE] == PROTO_PXX) {
-                    if(!inPopupMenu) {
+                    if(!popupMenuNoItems && !bindingChoiceMade) {
                       POPUP_MENU_ADD_ITEM(STR_BINDING_MODE1);
                       POPUP_MENU_ADD_ITEM(STR_BINDING_MODE2);
                       POPUP_MENU_ADD_ITEM(STR_BINDING_MODE3);
                       POPUP_MENU_ADD_ITEM(STR_BINDING_MODE4);
-                      inPopupMenu = true;
-                      newFlag = 0;
+                      bindingChoiceMade = false;
                       POPUP_MENU_START(onBindMenu);
+                      continue;
                     }
-                    else {
+                    if (bindingChoiceMade)
                       newFlag = MODULE_BIND;
-                    }
                   }
                   else {
                     newFlag = MODULE_BIND;
@@ -855,7 +858,7 @@ void menuModelSetup(event_t event)
                 }
               }
               else {
-                inPopupMenu = false;
+                bindingChoiceMade = false;
               }
             }
             moduleFlag[moduleIdx] = newFlag;
