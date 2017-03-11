@@ -101,6 +101,27 @@ enum MenuModelSetupItems {
 #define MODEL_SETUP_RANGE_OFS         7*FW
 #define MODEL_SETUP_SET_FAILSAFE_OFS  10*FW-2
 
+bool static bindingChoiceMade = false;
+void onBindMenu(const char * result)
+{
+  if (result == STR_BINDING_MODE1) {
+    g_model.moduleData[INTERNAL_MODULE].pxx.bind_mode = 0;
+    bindingChoiceMade = true;
+  }
+  else if (result == STR_BINDING_MODE2) {
+    g_model.moduleData[INTERNAL_MODULE].pxx.bind_mode = MODULE_BIND_TELEM_OFF-MODULE_BIND;
+    bindingChoiceMade = true;
+  }
+  else if (result == STR_BINDING_MODE3) {
+    g_model.moduleData[INTERNAL_MODULE].pxx.bind_mode = MODULE_BIND_9_16-MODULE_BIND;
+    bindingChoiceMade = true;
+  }
+  else if (result == STR_BINDING_MODE4) {
+    g_model.moduleData[INTERNAL_MODULE].pxx.bind_mode = MODULE_BIND_9_16_TELEM_OFF-MODULE_BIND;
+    bindingChoiceMade = true;
+  }
+}
+
 void copySelection(char * dst, const char * src, uint8_t size)
 {
   if (memcmp(src, "---", 3) == 0)
@@ -884,11 +905,32 @@ void menuModelSetup(event_t event)
               s_editMode=0;
             }
 #endif
-            if (attr && l_posHorz>0 && s_editMode>0) {
-              if (l_posHorz == 1)
-                newFlag = MODULE_BIND;
-              else if (l_posHorz == 2) {
-                newFlag = MODULE_RANGECHECK;
+            if (attr && l_posHorz>0) {
+              if(s_editMode>0) {
+                if (l_posHorz == 1) {
+                  if (IS_MODULE_XJT(moduleIdx) && g_model.moduleData[moduleIdx].rfProtocol== RF_PROTO_X16 && s_current_protocol[INTERNAL_MODULE] == PROTO_PXX) {
+                    if(!popupMenuNoItems && !bindingChoiceMade) {
+                      POPUP_MENU_ADD_ITEM(STR_BINDING_MODE1);
+                      POPUP_MENU_ADD_ITEM(STR_BINDING_MODE2);
+                      POPUP_MENU_ADD_ITEM(STR_BINDING_MODE3);
+                      POPUP_MENU_ADD_ITEM(STR_BINDING_MODE4);
+                      bindingChoiceMade = false;
+                      POPUP_MENU_START(onBindMenu);
+                      continue;
+                    }
+                    if (bindingChoiceMade)
+                      newFlag = MODULE_BIND;
+                  }
+                  else {
+                    newFlag = MODULE_BIND;
+                  }
+                }
+                else if (l_posHorz == 2) {
+                  newFlag = MODULE_RANGECHECK;
+                }
+              }
+              else {
+                bindingChoiceMade = false;
               }
             }
             moduleFlag[moduleIdx] = newFlag;
