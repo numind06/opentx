@@ -374,6 +374,7 @@ void setupPulsesPXX(uint8_t port)
   }
 
   /* Ext. flag (holds antenna selection on Horus internal module, 0x00 otherwise) */
+#if defined(PCBHORUS) || defined(PCBTARANIS)
   uint8_t extra_flags = XJT_INTERNAL_ANTENNA;
     if (port == INTERNAL_MODULE) {
 #if defined(PCBHORUS)
@@ -381,9 +382,10 @@ void setupPulsesPXX(uint8_t port)
 #endif
     extra_flags |= g_model.moduleData[INTERNAL_MODULE].pxx.bind_mode << 1;
   }
-
   putPcmByte(port, extra_flags);
-
+#else
+  putPcmByte(port, 0);
+#endif
 
   /* CRC */
   putPcmCrc(port);

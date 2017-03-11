@@ -833,6 +833,7 @@ void menuModelSetup(event_t event)
               s_editMode=0;
             }
 #endif
+#if defined(PCBX7)
             if (attr && l_posHorz>0) {
               if(s_editMode>0) {
                 if (l_posHorz == 1) {
@@ -859,6 +860,13 @@ void menuModelSetup(event_t event)
               }
               else {
                 bindingChoiceMade = false;
+#else
+            if (attr && l_posHorz>0 && s_editMode>0) {
+              if (l_posHorz == 1)
+                newFlag = MODULE_BIND;
+              else if (l_posHorz == 2) {
+                newFlag = MODULE_RANGECHECK;
+#endif
               }
             }
             moduleFlag[moduleIdx] = newFlag;
