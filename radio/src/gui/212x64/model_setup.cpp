@@ -104,20 +104,24 @@ enum MenuModelSetupItems {
 bool static bindingChoiceMade = false;
 void onBindMenu(const char * result)
 {
-  if (result == STR_BINDING_MODE1) {
-    g_model.moduleData[INTERNAL_MODULE].pxx.bind_mode = 0;
+  if (result == STR_BINDING_1_8_TELEM_ON) {
+    g_model.moduleData[INTERNAL_MODULE].pxx.receiver_telem_off = false;
+    g_model.moduleData[INTERNAL_MODULE].pxx.receiver_channel_9_16 = false;
     bindingChoiceMade = true;
   }
-  else if (result == STR_BINDING_MODE2) {
-    g_model.moduleData[INTERNAL_MODULE].pxx.bind_mode = MODULE_BIND_TELEM_OFF-MODULE_BIND;
+  else if (result == STR_BINDING_1_8_TELEM_OFF) {
+    g_model.moduleData[INTERNAL_MODULE].pxx.receiver_telem_off = true;
+    g_model.moduleData[INTERNAL_MODULE].pxx.receiver_channel_9_16 = false;
     bindingChoiceMade = true;
   }
-  else if (result == STR_BINDING_MODE3) {
-    g_model.moduleData[INTERNAL_MODULE].pxx.bind_mode = MODULE_BIND_9_16-MODULE_BIND;
+  else if (result == STR_BINDING_9_16_TELEM_ON) {
+    g_model.moduleData[INTERNAL_MODULE].pxx.receiver_telem_off = false;
+    g_model.moduleData[INTERNAL_MODULE].pxx.receiver_channel_9_16 = true;
     bindingChoiceMade = true;
   }
-  else if (result == STR_BINDING_MODE4) {
-    g_model.moduleData[INTERNAL_MODULE].pxx.bind_mode = MODULE_BIND_9_16_TELEM_OFF-MODULE_BIND;
+  else if (result == STR_BINDING_9_16_TELEM_OFF) {
+    g_model.moduleData[INTERNAL_MODULE].pxx.receiver_telem_off = true;
+    g_model.moduleData[INTERNAL_MODULE].pxx.receiver_channel_9_16 = true;
     bindingChoiceMade = true;
   }
 }
@@ -910,10 +914,10 @@ void menuModelSetup(event_t event)
                 if (l_posHorz == 1) {
                   if (IS_MODULE_XJT(moduleIdx) && g_model.moduleData[moduleIdx].rfProtocol== RF_PROTO_X16 && s_current_protocol[INTERNAL_MODULE] == PROTO_PXX) {
                     if(!popupMenuNoItems && !bindingChoiceMade) {
-                      POPUP_MENU_ADD_ITEM(STR_BINDING_MODE1);
-                      POPUP_MENU_ADD_ITEM(STR_BINDING_MODE2);
-                      POPUP_MENU_ADD_ITEM(STR_BINDING_MODE3);
-                      POPUP_MENU_ADD_ITEM(STR_BINDING_MODE4);
+                      POPUP_MENU_ADD_ITEM(STR_BINDING_1_8_TELEM_ON);
+                      POPUP_MENU_ADD_ITEM(STR_BINDING_1_8_TELEM_OFF);
+                      POPUP_MENU_ADD_ITEM(STR_BINDING_9_16_TELEM_ON);
+                      POPUP_MENU_ADD_ITEM(STR_BINDING_9_16_TELEM_OFF);
                       bindingChoiceMade = false;
                       POPUP_MENU_START(onBindMenu);
                       continue;

@@ -380,7 +380,8 @@ void setupPulsesPXX(uint8_t port)
 #if defined(PCBHORUS)
     extra_flags = g_model.moduleData[INTERNAL_MODULE].pxx.external_antenna;
 #endif
-    extra_flags |= g_model.moduleData[INTERNAL_MODULE].pxx.bind_mode << 1;
+    extra_flags |= g_model.moduleData[INTERNAL_MODULE].pxx.receiver_telem_off << 1;
+    extra_flags |= g_model.moduleData[INTERNAL_MODULE].pxx.receiver_channel_9_16 << 2;
   }
   putPcmByte(port, extra_flags);
 #else

@@ -677,8 +677,9 @@ PACK(struct ModuleData {
     } multi);
     NOBACKUP(struct {
       uint8_t spare:4;
-      uint8_t bind_mode:2;
-      uint8_t external_antenna:1; // false = internal antenna, true = external antenna
+      uint8_t receiver_telem_off:1;     // false = receiver telem enabled
+      uint8_t receiver_channel_9_16:1;  // false = pwm out 1-8, true 9-16
+      uint8_t external_antenna:1;       // false = internal antenna, true = external antenna
       uint8_t spare2:1;
       uint8_t spare3;
     } pxx);
