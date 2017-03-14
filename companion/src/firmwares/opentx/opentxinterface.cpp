@@ -517,11 +517,6 @@ int OpenTxFirmware::getCapability(::Capability capability)
         return getBoardCapability(board, Board::Switches) * 3;
       else
         return 9;
-    case NumTrimSwitches:
-      if (IS_HORUS(board))
-        return 12;
-      else
-        return 8;
     case CustomFunctions:
       if (IS_ARM(board))
         return 64;
@@ -557,7 +552,7 @@ int OpenTxFirmware::getCapability(::Capability capability)
     case VoicesAsNumbers:
       return (IS_ARM(board) ? 0 : 1);
     case VoicesMaxLength:
-      return (IS_ARM(board) ? (IS_TARANIS(board) ? 8 : 6) : 0);
+      return (IS_ARM(board) ? (IS_TARANIS_X9(board) ? 8 : 6) : 0);
     case MultiLangVoice:
       return (IS_ARM(board) ? 1 : 0);
     case SoundPitch:
@@ -719,8 +714,6 @@ int OpenTxFirmware::getCapability(::Capability capability)
     case HasInputDiff:
     case HasMixerExpo:
       return (IS_HORUS_OR_TARANIS(board) ? true : false);
-    case MixersMonitor:
-      return id.contains("mixersmon") ? 1 : 0;
     case HasBatMeterRange:
       return (IS_HORUS_OR_TARANIS(board) ? true : id.contains("battgraph"));
     case DangerousFunctions:
@@ -735,48 +728,60 @@ int OpenTxFirmware::getCapability(::Capability capability)
 QString OpenTxFirmware::getAnalogInputName(unsigned int index)
 {
   if (index < 4) {
-    const QString sticks[] = { QObject::tr("Rud"),
-                               QObject::tr("Ele"),
-                               QObject::tr("Thr"),
-                               QObject::tr("Ail") };
+    const QString sticks[] = {
+      QObject::tr("Rud"),
+      QObject::tr("Ele"),
+      QObject::tr("Thr"),
+      QObject::tr("Ail")
+    };
     return sticks[index];
   }
 
   index -= 4;
 
   if (IS_9X(board) || IS_2560(board) || IS_SKY9X(board)) {
-    const QString pots[]  = { QObject::tr("P1"),
-                              QObject::tr("P2"),
-                              QObject::tr("P3") };
+    const QString pots[] = {
+      QObject::tr("P1"),
+      QObject::tr("P2"),
+      QObject::tr("P3")
+    };
     return CHECK_IN_ARRAY(pots, index);
   }
   else if (IS_TARANIS_X9E(board)) {
-    const QString pots[] = { QObject::tr("F1"),
-                             QObject::tr("F2"),
-                             QObject::tr("F3"),
-                             QObject::tr("F4"),
-                             QObject::tr("S1"),
-                             QObject::tr("S2"),
-                             QObject::tr("LS"),
-                             QObject::tr("RS") };
+    const QString pots[] = {
+      QObject::tr("F1"),
+      QObject::tr("F2"),
+      QObject::tr("F3"),
+      QObject::tr("F4"),
+      QObject::tr("S1"),
+      QObject::tr("S2"),
+      QObject::tr("LS"),
+      QObject::tr("RS")
+    };
     return CHECK_IN_ARRAY(pots, index);
   }
   else if (IS_TARANIS(board)) {
-    const QString pots[] = {QObject::tr("S1"),
-                            QObject::tr("S2"),
-                            QObject::tr("S3"),
-                            QObject::tr("LS"),
-                            QObject::tr("RS")};
+    const QString pots[] = {
+      QObject::tr("S1"),
+      QObject::tr("S2"),
+      QObject::tr("S3"),
+      QObject::tr("LS"),
+      QObject::tr("RS")
+    };
     return CHECK_IN_ARRAY(pots, index);
   }
   else if (IS_HORUS(board)) {
-    const QString pots[] = {QObject::tr("S1"),
-                            QObject::tr("6P"),
-                            QObject::tr("S2"),
-                            QObject::tr("L1"),
-                            QObject::tr("L2"),
-                            QObject::tr("LS"),
-                            QObject::tr("RS")};
+    const QString pots[] = {
+      QObject::tr("S1"),
+      QObject::tr("6P"),
+      QObject::tr("S2"),
+      QObject::tr("L1"),
+      QObject::tr("L2"),
+      QObject::tr("LS"),
+      QObject::tr("RS"),
+      QObject::tr("JSx"),
+      QObject::tr("JSy")
+    };
     return CHECK_IN_ARRAY(pots, index);
   }
   else {
@@ -855,6 +860,8 @@ int OpenTxFirmware::isAvailable(PulsesProtocol proto, int port)
           case PULSES_DSM2:
           case PULSES_DSMX:
             return 1;
+          case PULSES_MULTIMODULE:
+            return id.contains("multimodule") ? 1 : 0;
           default:
             return 0;
         }
@@ -1154,7 +1161,6 @@ void addOpenTxFrskyOptions(OpenTxFirmware * firmware)
 void addOpenTxTaranisOptions(OpenTxFirmware * firmware)
 {
   addOpenTxFrskyOptions(firmware);
-  firmware->addOption("mixersmon", QObject::tr("Adds mixers output view to the CHANNELS MONITOR screen, pressing [ENT] switches between the views"));
   firmware->addOption("internalppm", QObject::tr("Support for PPM internal module hack"));
   firmware->addOption("sqt5font", QObject::tr("Use alternative SQT5 font"));
 }
@@ -1238,7 +1244,7 @@ void registerOpenTxFirmwares()
   addOpenTxFrskyOptions(firmware);
   firmware->addOption("pcbdev", QObject::tr("Use ONLY with first DEV pcb version"));
   registerOpenTxFirmware(firmware);
-  
+
 
   /* FrSky X10 board */
 /* Disabled for now
@@ -1260,6 +1266,7 @@ void registerOpenTxFirmwares()
   firmware->addOption("nobold", QObject::tr("Don't use bold font for highlighting active items"));
   firmware->addOption("bluetooth", QObject::tr("Bluetooth interface"));
   firmware->addOption("sqt5font", QObject::tr("Use alternative SQT5 font"));
+  addOpenTxArmOptions(firmware);
   addOpenTxCommonOptions(firmware);
   registerOpenTxFirmware(firmware);
 
@@ -1411,6 +1418,7 @@ void registerOpenTxFirmwares()
   firmware->addOption("sqt5font", QObject::tr("Use alternative SQT5 font"));
 //  firmware->addOption("rtc", QObject::tr("Optional RTC added"));
 //  firmware->addOption("volume", QObject::tr("i2c volume control added"));
+  addOpenTxArmOptions(firmware);
   addOpenTxCommonOptions(firmware);
   registerOpenTxFirmware(firmware);
 
@@ -1429,6 +1437,7 @@ void registerOpenTxFirmwares()
   firmware->addOption("nobold", QObject::tr("Don't use bold font for highlighting active items"));
   firmware->addOption("bluetooth", QObject::tr("Bluetooth interface"));
   firmware->addOption("sqt5font", QObject::tr("Use alternative SQT5 font"));
+  addOpenTxArmOptions(firmware);
   addOpenTxCommonOptions(firmware);
   registerOpenTxFirmware(firmware);
 
@@ -1476,7 +1485,6 @@ void registerOpenTxFirmwares()
   firmware->addOption("ppmca", QObject::tr("PPM center adjustment in limits"));
   firmware->addOption("gvars", QObject::tr("Global variables"), GVARS_VARIANT);
   firmware->addOption("symlimits", QObject::tr("Symetrical Limits"));
-  firmware->addOption("mixersmon", QObject::tr("Adds mixers output view to the CHANNELS MONITOR screen, pressing [ENT] switches between the views"));
   firmware->addOption("autosource", QObject::tr("In model setup menus automatically set source by moving the control"));
   firmware->addOption("autoswitch", QObject::tr("In model setup menus automatically set switch by moving the control"));
   firmware->addOption("dblkeys", QObject::tr("Enable resetting values by pressing up and down at the same time"));

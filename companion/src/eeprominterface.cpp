@@ -28,6 +28,7 @@
 #include "wizarddata.h"
 #include "firmwareinterface.h"
 #include "macros.h"
+#include "multiprotocols.h"
 #include <stdio.h>
 #include <list>
 #include <float.h>
@@ -502,7 +503,7 @@ QString RotaryEncoderString(int index)
 QString RawSource::toString(const ModelData * model) const
 {
   static const QString trims[] = {
-    QObject::tr("TrmR"), QObject::tr("TrmE"), QObject::tr("TrmT"), QObject::tr("TrmA")
+    QObject::tr("TrmR"), QObject::tr("TrmE"), QObject::tr("TrmT"), QObject::tr("TrmA"), QObject::tr("Trm5"), QObject::tr("Trm6")
   };
 
   static const QString special[] = {
@@ -616,7 +617,9 @@ QString RawSwitch::toString(Board::Type board) const
     QObject::tr("RudTrim Left"), QObject::tr("RudTrim Right"),
     QObject::tr("EleTrim Down"), QObject::tr("EleTrim Up"),
     QObject::tr("ThrTrim Down"), QObject::tr("ThrTrim Up"),
-    QObject::tr("AilTrim Left"), QObject::tr("AilTrim Right")
+    QObject::tr("AilTrim Left"), QObject::tr("AilTrim Right"),
+    QObject::tr("Trim 5 Down"), QObject::tr("Trim 5 Up"),
+    QObject::tr("Trim 6 Down"), QObject::tr("Trim 6 Up")
   };
 
   static const QString rotaryEncoders[] = {
@@ -1842,46 +1845,6 @@ SimulatorInterface * getCurrentSimulator()
     return factory->create();
   else
     return NULL;
-}
-
-unsigned int getNumSubtypes(MultiModuleRFProtocols type)
-{
-  switch (type) {
-    case MM_RF_PROTO_HISKY:
-    case MM_RF_PROTO_SYMAX:
-    case MM_RF_PROTO_KN:
-    case MM_RF_PROTO_SLT:
-    case MM_RF_PROTO_FY326:
-    case MM_RF_PROTO_BAYANG:
-    case MM_RF_PROTO_V2X2:
-      return 2;
-
-    case MM_RF_PROTO_Q2X2:
-    case MM_RF_PROTO_CG023:
-      return 3;
-
-    case MM_RF_PROTO_DSM2:
-    case MM_RF_PROTO_MT99XX:
-    case MM_RF_PROTO_HONTAI:
-    case MM_RF_PROTO_AFHDS2A:
-    case MM_RF_PROTO_Q303:
-      return 4;
-
-    case MM_RF_PROTO_FLYSKY:
-    case MM_RF_PROTO_MJXQ:
-    case MM_RF_PROTO_YD717:
-      return 5;
-
-    case MM_RF_PROTO_FRSKY:
-    case MM_RF_PROTO_WK_2X01:
-      return 6;
-
-    case MM_RF_PROTO_CX10:
-      return 8;
-    default:
-      return 1;
-  }
-
 }
 
 void FlightModeData::clear(const int phase)

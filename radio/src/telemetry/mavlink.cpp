@@ -27,7 +27,7 @@
 
 // this might need to move to the flight software
 //static
-mavlink_system_t mavlink_system = { 7, MAV_COMP_ID_MISSIONPLANNER, 0, 0, 0, 0 };
+mavlink_system_t mavlink_system = { 7, MAV_COMP_ID_MISSIONPLANNER };
 
 // Mavlink message decoded Status Text
 #define PARAM_NB_REPEAT 10
@@ -117,7 +117,15 @@ static inline void REC_MAVLINK_MSG_ID_SYS_STATUS(const mavlink_message_t* msg) {
 #endif
 }
 
-/*!	\brief Recive rc channels
+/*!	\brief Receive rc channels
+ *
+ */
+static inline void REC_MAVLINK_MSG_ID_RC_CHANNELS(const mavlink_message_t* msg) {
+	uint8_t temp_scale = 5 + g_model.mavlink.rc_rssi_scale;
+	telemetry_data.rc_rssi =  mavlink_msg_rc_channels_get_rssi(msg) * 20 / temp_scale;
+}
+
+/*!	\brief Receive raw rc channels
  *
  */
 static inline void REC_MAVLINK_MSG_ID_RC_CHANNELS_RAW(const mavlink_message_t* msg) {
@@ -368,6 +376,9 @@ static inline void handleMessage(mavlink_message_t* p_rxmsg) {
 		break;
 	case MAVLINK_MSG_ID_SYS_STATUS:
 		REC_MAVLINK_MSG_ID_SYS_STATUS(p_rxmsg);
+		break;
+	case MAVLINK_MSG_ID_RC_CHANNELS:
+		REC_MAVLINK_MSG_ID_RC_CHANNELS(p_rxmsg);
 		break;
 	case MAVLINK_MSG_ID_RC_CHANNELS_RAW:
 		REC_MAVLINK_MSG_ID_RC_CHANNELS_RAW(p_rxmsg);

@@ -53,6 +53,9 @@ enum MenuModelSetupItems {
   CASE_CPUARM(ITEM_MODEL_CHECKLIST_DISPLAY)
   ITEM_MODEL_THROTTLE_WARNING,
   ITEM_MODEL_SWITCHES_WARNING,
+#if defined(PCBX7)
+  ITEM_MODEL_POTS_WARNING,
+#endif
   ITEM_MODEL_BEEP_CENTER,
   CASE_CPUARM(ITEM_MODEL_USE_GLOBAL_FUNCTIONS)
 #if defined(PCBX7)
@@ -198,7 +201,7 @@ void onBindMenu(const char * result)
 void menuModelSetup(event_t event)
 {
 #if defined(PCBX7)
-  MENU_TAB({ HEADER_LINE_COLUMNS 0, TIMER_ROWS, TIMER_ROWS, TIMER_ROWS, 0, 1, 0, 0, 0, 0, 0, CASE_CPUARM(LABEL(PreflightCheck)) CASE_CPUARM(0) 0, NUM_SWITCHES-1, NUM_STICKS+NUM_POTS+NUM_SLIDERS+NUM_ROTARY_ENCODERS-1, 0,
+  MENU_TAB({ HEADER_LINE_COLUMNS 0, TIMER_ROWS, TIMER_ROWS, TIMER_ROWS, 0, 1, 0, 0, 0, 0, 0, CASE_CPUARM(LABEL(PreflightCheck)) CASE_CPUARM(0) 0, NUM_SWITCHES-1,  NUM_POTS, NUM_STICKS+NUM_POTS+NUM_SLIDERS+NUM_ROTARY_ENCODERS-1, 0,
   LABEL(InternalModule),
   INTERNAL_MODULE_MODE_ROWS,
   INTERNAL_MODULE_CHANNELS_ROWS,
@@ -497,8 +500,13 @@ void menuModelSetup(event_t event)
                 g_model.switchWarningEnable ^= (1 << menuHorizontalPosition);
                 storageDirty(EE_MODEL);
 #else
+#if defined(PCBX7)
+                if (menuHorizontalPosition < NUM_SWITCHES) {
+                  g_model.switchWarningEnable ^= (1 << (menuHorizontalPosition-1));
+#else
                 if (menuHorizontalPosition < NUM_SWITCHES-1) {
                   g_model.switchWarningEnable ^= (1 << menuHorizontalPosition);
+#endif
                   storageDirty(EE_MODEL);
                 }
 #endif
@@ -511,10 +519,12 @@ void menuModelSetup(event_t event)
                 AUDIO_WARNING1();
                 storageDirty(EE_MODEL);
 #elif defined(PCBX7)
-                getMovedSwitch();
-                g_model.switchWarningState = switches_states;
-                AUDIO_WARNING1();
-                storageDirty(EE_MODEL);
+                if (attr && menuHorizontalPosition == 0) {
+                  getMovedSwitch();
+                  g_model.switchWarningState = switches_states;
+                  AUDIO_WARNING1();
+                  storageDirty(EE_MODEL);
+                }
 #else
                 if (menuHorizontalPosition == NUM_SWITCHES-1) {
                   START_NO_HIGHLIGHT();
@@ -529,7 +539,6 @@ void menuModelSetup(event_t event)
             }
           }
         }
-
         LcdFlags line = attr;
 #if defined(PCBX7)
         int current = 0;
@@ -537,11 +546,14 @@ void menuModelSetup(event_t event)
           if (SWITCH_WARNING_ALLOWED(i)) {
             uint8_t swactive = !(g_model.switchWarningEnable & (1<<i));
             c = "\300-\301"[states & 0x03];
-            lcdDrawChar(MODEL_SETUP_2ND_COLUMN+(2*FW*i), y, (i < 4 ? 'A'+i : 'B'+i), line && (menuHorizontalPosition==current) ? INVERS : 0);
+            lcdDrawChar(MODEL_SETUP_2ND_COLUMN+(2*FW*i), y, (i < 4 ? 'A'+i : 'B'+i), line && (menuHorizontalPosition-1==current) ? INVERS : 0);
             if (swactive) lcdDrawChar(lcdNextPos, y, c);
             ++current;
           }
           states >>= 2;
+        }
+        if (attr && menuHorizontalPosition == 0) {
+          lcdDrawFilledRect(MODEL_SETUP_2ND_COLUMN-1, y-1, (NUM_SWITCHES-1)*(2*FW), 1+FH*((current+7)/8));
         }
 #else // PCBX7
         for (uint8_t i=0; i<NUM_SWITCHES-1/*not on TRN switch*/; i++) {
@@ -573,6 +585,54 @@ void menuModelSetup(event_t event)
 #endif // PCBX7
         break;
       }
+#if defined(PCBX7)
+      case ITEM_MODEL_POTS_WARNING:
+        lcdDrawTextAlignedLeft(y, STR_POTWARNING);
+        lcdDrawTextAtIndex(MODEL_SETUP_2ND_COLUMN, y, PSTR("\004""OFF\0""Man\0""Auto"), g_model.potsWarnMode, (menuHorizontalPosition == 0) ? attr : 0);
+        if (attr && (menuHorizontalPosition == 0)) {
+          CHECK_INCDEC_MODELVAR(event, g_model.potsWarnMode, POTS_WARN_OFF, POTS_WARN_AUTO);
+          storageDirty(EE_MODEL);
+        }
+
+        if (attr) {
+          if (menuHorizontalPosition > 0) s_editMode = 0;
+          if (!READ_ONLY() && menuHorizontalPosition > 0) {
+            switch (event) {
+              case EVT_KEY_LONG(KEY_ENTER):
+                killEvents(event);
+                if (g_model.potsWarnMode == POTS_WARN_MANUAL) {
+                  SAVE_POT_POSITION(menuHorizontalPosition-1);
+                  AUDIO_WARNING1();
+                  storageDirty(EE_MODEL);
+                }
+                break;
+              case EVT_KEY_BREAK(KEY_ENTER):
+                g_model.potsWarnEnabled ^= (1 << (menuHorizontalPosition-1));
+                storageDirty(EE_MODEL);
+                break;
+            }
+          }
+        }
+        if (g_model.potsWarnMode) {
+          coord_t x = MODEL_SETUP_2ND_COLUMN+28;
+          for (int i=0; i<NUM_POTS+NUM_SLIDERS; ++i) {
+            if (i<NUM_XPOTS && !IS_POT_SLIDER_AVAILABLE(POT1+i)) {
+              if (attr && (menuHorizontalPosition==i+1)) REPEAT_LAST_CURSOR_MOVE();
+            }
+            else {
+              LcdFlags flags = ((menuHorizontalPosition==i+1) && attr) ? BLINK : 0;
+              if ((!attr || menuHorizontalPosition >= 0) && !(g_model.potsWarnEnabled & (1 << i))) {
+                flags |= INVERS;
+              }
+
+              // TODO add a new function
+              lcdDrawSizedText(x, y, STR_VSRCRAW+2+STR_VSRCRAW[0]*(NUM_STICKS+1+i), STR_VSRCRAW[0]-1, flags & ~ZCHAR);
+              x = lcdNextPos+3;
+            }
+          }
+        }
+        break;
+#endif // PCBX7
 
       case ITEM_MODEL_BEEP_CENTER:
         lcdDrawTextAlignedLeft(y, STR_BEEPCTR);
@@ -750,9 +810,9 @@ void menuModelSetup(event_t event)
         lcdDrawTextAlignedLeft(y, STR_CHANNELRANGE);
         if ((int8_t)PORT_CHANNELS_ROWS(moduleIdx) >= 0) {
           lcdDrawText(MODEL_SETUP_2ND_COLUMN, y, STR_CH, menuHorizontalPosition==0 ? attr : 0);
-          lcdDrawNumber(lcdLastPos, y, moduleData.channelsStart+1, LEFT | (menuHorizontalPosition==0 ? attr : 0));
-          lcdDrawChar(lcdLastPos, y, '-');
-          lcdDrawNumber(lcdLastPos + FW+1, y, moduleData.channelsStart+NUM_CHANNELS(moduleIdx), LEFT | (menuHorizontalPosition==1 ? attr : 0));
+          lcdDrawNumber(lcdLastRightPos, y, moduleData.channelsStart+1, LEFT | (menuHorizontalPosition==0 ? attr : 0));
+          lcdDrawChar(lcdLastRightPos, y, '-');
+          lcdDrawNumber(lcdLastRightPos + FW+1, y, moduleData.channelsStart+NUM_CHANNELS(moduleIdx), LEFT | (menuHorizontalPosition==1 ? attr : 0));
           if (attr && (editMode>0 || p1valdiff)) {
             switch (menuHorizontalPosition) {
               case 0:
@@ -1009,9 +1069,9 @@ void menuModelSetup(event_t event)
         lcdDrawTextAlignedLeft(y, PSTR("Port2"));
         lcdDrawTextAtIndex(MODEL_SETUP_2ND_COLUMN, y, STR_VPROTOS, 0, 0);
         lcdDrawText(MODEL_SETUP_2ND_COLUMN+4*FW+3, y, STR_CH, menuHorizontalPosition<=0 ? attr : 0);
-        lcdDrawNumber(lcdLastPos, y, g_model.moduleData[1].channelsStart+1, LEFT | (menuHorizontalPosition<=0 ? attr : 0));
-        lcdDrawChar(lcdLastPos, y, '-');
-        lcdDrawNumber(lcdLastPos + FW+1, y, g_model.moduleData[1].channelsStart+8+g_model.moduleData[1].channelsCount, LEFT | (menuHorizontalPosition!=0 ? attr : 0));
+        lcdDrawNumber(lcdLastRightPos, y, g_model.moduleData[1].channelsStart+1, LEFT | (menuHorizontalPosition<=0 ? attr : 0));
+        lcdDrawChar(lcdLastRightPos, y, '-');
+        lcdDrawNumber(lcdLastRightPos + FW+1, y, g_model.moduleData[1].channelsStart+8+g_model.moduleData[1].channelsCount, LEFT | (menuHorizontalPosition!=0 ? attr : 0));
         if (attr && (editMode>0 || p1valdiff)) {
           switch (menuHorizontalPosition) {
             case 0:

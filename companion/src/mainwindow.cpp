@@ -61,12 +61,6 @@
   #define COMPANION_INSTALLER             "companion-windows-%1.exe"
 #endif
 
-#if defined _MSC_VER || !defined __GNUC__
-  #include <windows.h>
-  #define sleep(x) Sleep(x*1000)
-#else
-  #include <unistd.h>
-#endif
 #ifdef WIN32
   #define OPENTX_NIGHT_COMPANION_DOWNLOADS  "http://downloads-22.open-tx.org/nightly/companion/windows"
 #else
@@ -549,6 +543,10 @@ void MainWindow::newFile()
 {
   MdiChild * child = createMdiChild();
   child->newFile();
+    
+  if (IS_HORUS(getCurrentBoard())) {
+    child->categoryAdd();
+  }    
   child->show();
 }
 

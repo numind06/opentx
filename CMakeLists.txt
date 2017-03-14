@@ -6,7 +6,7 @@ set(VERSION_REVISION "0")
 set(VERSION_SUFFIX $ENV{OPENTX_VERSION_SUFFIX})
 set(VERSION_FAMILY ${VERSION_MAJOR}.${VERSION_MINOR})
 set(VERSION ${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REVISION}${VERSION_SUFFIX})
-set(SDCARD_REVISION "0006")
+set(SDCARD_REVISION "0007")
 set(SDCARD_VERSION  ${VERSION_MAJOR}.${VERSION_MINOR}V${SDCARD_REVISION})
 
 cmake_minimum_required(VERSION 2.8)
@@ -43,8 +43,16 @@ git_id(GIT_STR)
 message(STATUS "OpenTX ${VERSION} @${GIT_STR}")
 
 # options shared by all targets
+
+option(APP_CUSTOM_DBG_HANDLER "Use custom message handler for debug output in all Qt apps." ON)
+set(APP_CUSTOM_DBG_LEVEL "0" CACHE STRING
+  "Debug output level: 0=debug+; 1=info+; 2=warn+; 3=critical+; 4=fatal only.")
+set(APP_CUSTOM_DBG_SHOW_FILE "DEFAULT" CACHE STRING
+  "Show source file names in debug output. 1/0/DEFAULT (default is ON with DEBUG builds).")
+
 option(VERBOSE_CMAKELISTS "Show extra information while processing CMakeLists.txt files." OFF)
 option(WARNINGS_AS_ERRORS "Treat any compiler warning as an error (adds -Werror flag)." OFF)
+
 if(WIN32)
   set(WIN_EXTRA_LIBS_PATH "C:/Programs" CACHE PATH
     "Base path to extra libs/headers on Windows (SDL & pthreads folders should be in here).")
@@ -60,6 +68,22 @@ find_package(Qt5Svg)
 
 if(Qt5Widgets_FOUND)
   message(STATUS "Qt Version: ${Qt5Widgets_VERSION}")
+  list(APPEND APP_COMMON_DEFINES -DSIMU)
+  list(APPEND APP_COMMON_DEFINES -DQXT_STATIC)
+  list(APPEND APP_COMMON_DEFINES -DQT_USE_QSTRINGBUILDER)  # more efficient QString construction using % operator
+  if(APP_CUSTOM_DBG_HANDLER)
+    # provide full qDebug log context to our custom handler. This may also affect libsimulator, which is why it is here
+    list(APPEND APP_COMMON_DEFINES -DQT_MESSAGELOGCONTEXT)
+    list(APPEND APP_COMMON_DEFINES -DAPP_DBG_HANDLER_ENABLE=1)
+    if(APP_CUSTOM_DBG_LEVEL GREATER -1 AND APP_CUSTOM_DBG_LEVEL LESS 5)
+      list(APPEND APP_COMMON_DEFINES -DAPP_DBG_HANDLER_DEFAULT_LEVEL=${APP_CUSTOM_DBG_LEVEL})
+    endif()
+    if(NOT APP_CUSTOM_DBG_SHOW_FILE STREQUAL "DEFAULT" AND (APP_CUSTOM_DBG_SHOW_FILE STREQUAL "1" OR APP_CUSTOM_DBG_SHOW_FILE STREQUAL "0"))
+      list(APPEND APP_COMMON_DEFINES -DAPP_DBG_HANDLER_SHOW_SRC_PATH=${APP_CUSTOM_DBG_SHOW_FILE})
+    endif()
+  else()
+    list(APPEND APP_COMMON_DEFINES -DAPP_DBG_HANDLER_ENABLE=0)
+  endif()
 else()
   message(WARNING "Qt not found! Companion and Simulator builds disabled.")
 endif()

@@ -328,6 +328,7 @@ void menuSpecialFunctions(event_t event, CustomFunctionData * functions, CustomF
           else if (func == FUNC_PLAY_VALUE) {
             val_max = MIXSRC_LAST_TELEM;
             drawSource(MODEL_SPECIAL_FUNC_3RD_COLUMN, y, val_displayed, attr);
+            INCDEC_SET_FLAG(eeFlags | INCDEC_SOURCE);
             INCDEC_ENABLE_CHECK(isSourceAvailable);
           }
 #endif
@@ -372,7 +373,7 @@ void menuSpecialFunctions(event_t event, CustomFunctionData * functions, CustomF
           else if (func == FUNC_LOGS) {
             if (val_displayed) {
               lcdDrawNumber(MODEL_SPECIAL_FUNC_3RD_COLUMN, y, val_displayed, attr|PREC1|LEFT);
-              lcdDrawChar(lcdLastPos, y, 's');
+              lcdDrawChar(lcdLastRightPos, y, 's');
             }
             else {
               lcdDrawMMM(MODEL_SPECIAL_FUNC_3RD_COLUMN, y, attr);
