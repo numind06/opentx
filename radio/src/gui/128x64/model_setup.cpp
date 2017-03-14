@@ -908,6 +908,7 @@ void menuModelSetup(event_t event)
                       POPUP_MENU_ADD_ITEM(STR_BINDING_9_16_TELEM_ON);
                       POPUP_MENU_ADD_ITEM(STR_BINDING_9_16_TELEM_OFF);
                       bindingChoiceMade = false;
+                      POPUP_MENU_SELECT_ITEM(g_model.moduleData[INTERNAL_MODULE].pxx.receiver_telem_off + (g_model.moduleData[INTERNAL_MODULE].pxx.receiver_channel_9_16 << 1));
                       POPUP_MENU_START(onBindMenu);
                       continue;
                     }

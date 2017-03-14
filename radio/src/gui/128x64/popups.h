@@ -71,8 +71,10 @@ extern uint8_t warningInfoFlags;
 #endif
 
 #if defined(CPUARM)
+  extern uint8_t s_menu_item;
   #define NAVIGATION_MENUS
   #define POPUP_MENU_ADD_ITEM(s)       do { popupMenuOffsetType = MENU_OFFSET_INTERNAL; if (popupMenuNoItems < POPUP_MENU_MAX_LINES) popupMenuItems[popupMenuNoItems++] = s; } while (0)
+  #define POPUP_MENU_SELECT_ITEM(s)    s_menu_item =  (s > 0 ? (s < POPUP_MENU_MAX_LINES ? s : POPUP_MENU_MAX_LINES) : 0);
   #define POPUP_MENU_START(func)       do { popupMenuHandler = (func); AUDIO_KEY_PRESS(); } while (0)
   #define POPUP_MENU_MAX_LINES         12
   #define MENU_MAX_DISPLAY_LINES       6
