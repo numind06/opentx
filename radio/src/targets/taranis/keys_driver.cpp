@@ -2,7 +2,7 @@
  * Copyright (C) OpenTX
  *
  * Based on code named
- *   th9x - http://code.google.com/p/th9x 
+ *   th9x - http://code.google.com/p/th9x
  *   er9x - http://code.google.com/p/er9x
  *   gruvin9x - http://code.google.com/p/gruvin9x
  *
@@ -169,7 +169,7 @@ uint8_t keyState(uint8_t index)
 uint32_t switchState(uint8_t index)
 {
   uint32_t xxx = 0;
-  
+
   switch (index) {
     ADD_3POS_CASE(A, 0);
     ADD_3POS_CASE(B, 1);
@@ -185,14 +185,14 @@ uint32_t switchState(uint8_t index)
     ADD_2POS_CASE(H);
 #endif
 #if defined(PCBX9E)
-    ADD_3POS_CASE(I, 8);
+    ADD_2POS_CASE(I);
     ADD_3POS_CASE(J, 9);
     ADD_3POS_CASE(K, 10);
     ADD_3POS_CASE(L, 11);
     ADD_3POS_CASE(M, 12);
     ADD_3POS_CASE(N, 13);
     ADD_3POS_CASE(O, 14);
-    ADD_3POS_CASE(P, 15);
+    ADD_2POS_CASE(P);
     ADD_3POS_CASE(Q, 16);
     ADD_3POS_CASE(R, 17);
 #endif
@@ -248,7 +248,7 @@ void keysInit()
   GPIO_InitStructure.GPIO_Pin = KEYS_GPIOG_PINS;
   GPIO_Init(GPIOG, &GPIO_InitStructure);
 #endif
-  
+
 #if defined(ROTARY_ENCODER_NAVIGATION)
   rotencPosition = ROTARY_ENCODER_POSITION();
 #endif

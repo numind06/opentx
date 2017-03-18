@@ -252,6 +252,8 @@
 #endif
 
 #if defined(PCBX9E)
+#define SWITCHES_GPIO_REG_I         GPIOF->IDR
+#define SWITCHES_GPIO_PIN_I         GPIO_Pin_15 // PF.15
   #define SWITCHES_GPIO_REG_I_H         GPIOF->IDR
   #define SWITCHES_GPIO_PIN_I_H         GPIO_Pin_15 // PF.15
   #define SWITCHES_GPIO_REG_I_L         GPIOE->IDR
@@ -282,6 +284,8 @@
   #define SWITCHES_GPIO_PIN_O_L         GPIO_Pin_10 // PE.10
   #define SWITCHES_GPIO_REG_P_H         GPIOF->IDR
   #define SWITCHES_GPIO_PIN_P_H         GPIO_Pin_11 // PF.11
+#define SWITCHES_GPIO_REG_P         GPIOF->IDR
+#define SWITCHES_GPIO_PIN_P         GPIO_Pin_11 // PF.11
   #define SWITCHES_GPIO_REG_P_L         GPIOF->IDR
   #define SWITCHES_GPIO_PIN_P_L         GPIO_Pin_12 // PF.12
   #define SWITCHES_GPIO_REG_Q_H         GPIOF->IDR
