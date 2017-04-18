@@ -1785,17 +1785,17 @@ Puede ser diferente del lenguaje del firmware</translation>
         <location filename="../flashfirmwaredialog.cpp" line="282"/>
         <location filename="../flashfirmwaredialog.cpp" line="290"/>
         <source>Firmware check failed</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Comprobación de firmware fallida</translation>
     </message>
     <message>
         <location filename="../flashfirmwaredialog.cpp" line="282"/>
         <source>Could not check firmware from radio</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">No se pudo comprobar el firmware de la radio</translation>
     </message>
     <message>
         <location filename="../flashfirmwaredialog.cpp" line="290"/>
         <source>New firmware is not compatible with the one currently installed!</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">El nuevo firmware no es compatible con el instalado actualmente</translation>
     </message>
     <message>
         <location filename="../flashfirmwaredialog.cpp" line="321"/>
@@ -1820,7 +1820,7 @@ Puede ser diferente del lenguaje del firmware</translation>
     <message>
         <location filename="../flashfirmwaredialog.cpp" line="329"/>
         <source>Flashing done</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Escritura hecha</translation>
     </message>
 </context>
 <context>
@@ -1843,34 +1843,34 @@ Puede ser diferente del lenguaje del firmware</translation>
     <message>
         <location filename="../process_flash.cpp" line="209"/>
         <source>Verifying...</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Verificando...</translation>
     </message>
     <message>
         <location filename="../process_flash.cpp" line="247"/>
         <source>unknown</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">desconocido</translation>
     </message>
     <message>
         <location filename="../process_flash.cpp" line="254"/>
         <source>ie: OpenTX for 9X board or OpenTX for 9XR board</source>
-        <translation type="unfinished">Esto es: OpenTX para placas 9x o OpenTX para placas 9XR</translation>
+        <translation type="unfinished">Ejemplo: OpenTX para placas 9x o OpenTX para placas 9XR</translation>
     </message>
     <message>
         <location filename="../process_flash.cpp" line="259"/>
         <source>ie: OpenTX for M128 / 9X board or OpenTX for 9XR board with M128 chip</source>
-        <translation type="unfinished">Esto es: OpenTX para placas M128 / 9x o OpenTX para placas 9XR con el chip M128</translation>
+        <translation type="unfinished">Ejemplo: OpenTX para placas M128 / 9x o OpenTX para placas 9XR con el chip M128</translation>
     </message>
     <message>
         <location filename="../process_flash.cpp" line="270"/>
         <source>ie: OpenTX for Gruvin9X  board</source>
-        <translation type="unfinished">Esto es: OpenTX para placas Gruvin9x</translation>
+        <translation type="unfinished">Ejemplo: OpenTX para placas Gruvin9x</translation>
     </message>
     <message>
         <location filename="../process_flash.cpp" line="278"/>
         <source>Your radio uses a %1 CPU!!!
 
 Please check advanced burn options to set the correct cpu type.</source>
-        <translation type="unfinished">Tu radio usa un %1 CPU!!!
+        <translation type="unfinished">Tu radio usa una CPU %1!!!
 
 Por favor comprueba en las opciones avanzadas de gravado el tipo correcto de cpu.</translation>
     </message>
@@ -1879,7 +1879,7 @@ Por favor comprueba en las opciones avanzadas de gravado el tipo correcto de cpu
         <source>Your radio uses a %1 CPU!!!
 
 Please select an appropriate firmware type to program it.</source>
-        <translation type="unfinished">Tu radio usa un %1 CPU!!!
+        <translation type="unfinished">Tu radio usa una CPU %1!!!
 
 Por favor elige el tipo de firmware apropiado para programarlo.</translation>
     </message>
@@ -1897,12 +1897,12 @@ Actualmente estás usando:
         <source>Your radio does not seem connected to USB or the driver is not installed!!!
 
 Please use ZADIG to properly install the driver.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">Tu radio no parece estar conectada por USB o el driver no está instalado!!!</translation>
     </message>
     <message>
         <location filename="../process_flash.cpp" line="289"/>
         <source>Your radio does not seem connected to USB or the driver is not initialized!!!.</source>
-        <translation type="unfinished"></translation>
+        <translation type="unfinished">>Tu radio no parece estar conectada por USB o el driver no está inicializado!!!</translation>
     </message>
     <message>
         <location filename="../process_flash.cpp" line="301"/>
